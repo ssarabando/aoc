@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 )
@@ -10,7 +11,7 @@ import (
 func main() {
 	file, err := os.Open("input.txt")
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	defer file.Close()
 
