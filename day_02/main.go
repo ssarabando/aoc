@@ -25,7 +25,7 @@ func main() {
 	var paper = Shape{"Paper"}
 	var scissors = Shape{"Scissors"}
 
-	var outcomes = map[Play]int{
+	var game_scores = map[Play]int{
 		{rock, scissors}:     score_lost,
 		{scissors, paper}:    score_lost,
 		{paper, rock}:        score_lost,
@@ -35,6 +35,24 @@ func main() {
 		{scissors, rock}:     score_won,
 		{paper, scissors}:    score_won,
 		{rock, paper}:        score_won,
+	}
+
+	var losing_plays = map[Shape]Shape{
+		rock:     scissors,
+		scissors: paper,
+		paper:    rock,
+	}
+
+	var draw_plays = map[Shape]Shape{
+		rock:     rock,
+		scissors: scissors,
+		paper:    paper,
+	}
+
+	var winning_plays = map[Shape]Shape{
+		rock:     paper,
+		paper:    scissors,
+		scissors: rock,
 	}
 
 	var shape_scores = map[Shape]int{
@@ -47,12 +65,6 @@ func main() {
 		'A': rock,
 		'B': paper,
 		'C': scissors,
-	}
-
-	var my_shapes = map[rune]Shape{
-		'X': rock,
-		'Y': paper,
-		'Z': scissors,
 	}
 
 	file, err := os.Open("input.txt")
@@ -71,9 +83,17 @@ func main() {
 
 		opponent_shape := opponent_shapes[opponent_play]
 
-		my_shape := my_shapes[my_play]
+		var my_shape Shape
+		switch my_play {
+		case 'X':
+			my_shape = losing_plays[opponent_shape]
+		case 'Y':
+			my_shape = draw_plays[opponent_shape]
+		default:
+			my_shape = winning_plays[opponent_shape]
+		}
 
-		outcome := shape_scores[my_shape] + outcomes[Play{opponent_shape, my_shape}]
+		outcome := shape_scores[my_shape] + game_scores[Play{opponent_shape, my_shape}]
 
 		fmt.Printf(
 			"Opponent: %s (%s); me: %s (%s) = %d\n",
