@@ -1,8 +1,7 @@
-package main
+package day02
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -20,7 +19,7 @@ const score_lost int = 0
 const score_draw int = 3
 const score_won int = 6
 
-func main() {
+func PartTwo(filename string) int {
 	var rock = Shape{"Rock"}
 	var paper = Shape{"Paper"}
 	var scissors = Shape{"Scissors"}
@@ -67,7 +66,7 @@ func main() {
 		'C': scissors,
 	}
 
-	file, err := os.Open("input.txt")
+	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -95,14 +94,8 @@ func main() {
 
 		outcome := shape_scores[my_shape] + game_scores[Play{opponent_shape, my_shape}]
 
-		fmt.Printf(
-			"Opponent: %s (%s); me: %s (%s) = %d\n",
-			string(opponent_play), opponent_shape.name,
-			string(my_play), my_shape.name,
-			outcome)
-
 		total_score += outcome
 	}
 
-	fmt.Printf("Total score: %d", total_score)
+	return total_score
 }
