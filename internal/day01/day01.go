@@ -1,15 +1,14 @@
-package main
+package day01
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
 )
 
-func main() {
-	file, err := os.Open("input.txt")
+func PartTwo(filename string) int {
+	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,5 +38,5 @@ func main() {
 		}
 	}
 
-	fmt.Println(top1 + top2 + top3)
+	return top1 + top2 + top3
 }
