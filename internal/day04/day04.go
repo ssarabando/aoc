@@ -18,6 +18,11 @@ func (lhs *section) Contains(rhs *section) bool {
 	return lhs.Start <= rhs.Start && lhs.Finish >= rhs.Finish
 }
 
+// contains returns true if the lhs section overlaps the rhs section.
+func (lhs *section) Overlaps(rhs *section) bool {
+	return lhs.Start <= rhs.Finish && lhs.Finish >= rhs.Start
+}
+
 func NewSection(data string) *section {
 	items := strings.Split(data, "-")
 
@@ -89,6 +94,17 @@ func PartOne(filename string) int {
 	pairs := readInputFile(filename)
 	for _, pair := range pairs {
 		if pair.Elf1.Contains(pair.Elf2) || pair.Elf2.Contains(pair.Elf1) {
+			overlapping_pairs += 1
+		}
+	}
+	return overlapping_pairs
+}
+
+func PartTwo(filename string) int {
+	overlapping_pairs := 0
+	pairs := readInputFile(filename)
+	for _, pair := range pairs {
+		if pair.Elf1.Overlaps(pair.Elf2) || pair.Elf2.Overlaps(pair.Elf1) {
 			overlapping_pairs += 1
 		}
 	}
