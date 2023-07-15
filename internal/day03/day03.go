@@ -1,8 +1,7 @@
-package main
+package day03
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -39,42 +38,51 @@ func group_priorities(elf_1_items string, elf_2_items string, elf_3_items string
 	return 0
 }
 
-func main() {
-	file, err := os.Open("input.txt")
+func readData(filename string) []string {
+	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
 
-	part_1_priorities := 0
-	part_2_priorities := 0
+	results := make([]string, 0)
 
 	scanner := bufio.NewScanner(file)
-	// We can read 3 lines at a time since Part 2 guarantees that there always
-	// are 3 elves in each group (that is, 3 lines).
 	for {
-		success := scanner.Scan()
-		if !success {
+		if ok := scanner.Scan(); !ok {
 			break
 		}
-		line1 := scanner.Text()
-
-		_ = scanner.Scan()
-		line2 := scanner.Text()
-
-		_ = scanner.Scan()
-		line3 := scanner.Text()
-
-		part_1_priorities += line_priority(line1)
-		part_1_priorities += line_priority(line2)
-		part_1_priorities += line_priority(line3)
-
-		part_2_priorities += group_priorities(line1, line2, line3)
-	}
-	if err = scanner.Err(); err != nil {
-		log.Fatal(err)
+		// Grow results by one
+		l := len(results)
+		newResults := make([]string, l+1)
+		copy(newResults, results)
+		results = newResults
+		// Append line to results
+		results[l] = scanner.Text()
 	}
 
-	fmt.Println("Sum of elf priorites:", part_1_priorities)
-	fmt.Println("Sum of group priorites:", part_2_priorities)
+	return results
+}
+
+func PartOne(filename string) int {
+	result := 0
+
+	lines := readData(filename)
+	for _, line := range lines {
+		result += line_priority(line)
+	}
+
+	return result
+}
+
+func PartTwo(filename string) int {
+	result := 0
+
+	lines := readData(filename)
+	number_of_lines := len(lines)
+	for line_number := 2; line_number < number_of_lines; line_number += 3 {
+		result += group_priorities(lines[line_number-2], lines[line_number-1], lines[line_number])
+	}
+
+	return result
 }
