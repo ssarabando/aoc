@@ -30,6 +30,17 @@ func pushCrate(crate string, crateStack *[]string) {
 	*crateStack = append(*crateStack, crate)
 }
 
+func popCrates(quantity int, crateStack *[]string) []string {
+	numberOfCrates := len(*crateStack)
+	topMostCrates := (*crateStack)[numberOfCrates-quantity : numberOfCrates]
+	*crateStack = (*crateStack)[:numberOfCrates-quantity]
+	return topMostCrates
+}
+
+func pushCrates(crates *[]string, crateStack *[]string) {
+	*crateStack = append(*crateStack, *crates...)
+}
+
 func decomposeManifest(manifest *[]string) *[][]string {
 	// Pad the end of the 1st row with one space so we can reason in terms of
 	// '[C] ' (that is, all stacks have 4 characters) even in the last stack
@@ -127,5 +138,25 @@ func PartOne(filename string) string {
 }
 
 func PartTwo(filename string) string {
-	return "XXX"
+	stacks, orders := readShipArrangement(filename)
+
+	shipHold := *decomposeManifest(&stacks)
+
+	for _, order := range orders {
+		quantity, source, destination := decomposeOrder(order)
+		crates := popCrates(quantity, &shipHold[source-1])
+		pushCrates(&crates, &shipHold[destination-1])
+	}
+
+	var stack []string
+
+	result := new(strings.Builder)
+	result.Grow(len(shipHold))
+	for stackNumber := 0; stackNumber < len(shipHold); stackNumber++ {
+		stack = shipHold[stackNumber]
+		positionOfTopCrate := len(stack) - 1
+		result.WriteString(stack[positionOfTopCrate])
+	}
+
+	return result.String()
 }
