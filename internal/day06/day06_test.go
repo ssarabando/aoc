@@ -11,7 +11,7 @@ type partOneTest struct {
 
 func TestPartOne(t *testing.T) {
 	tests := []partOneTest{
-		{"day06_test_input_1.txt", 4},
+		{"day06_test_input_1.txt", 7},
 		{"day06_test_input_2.txt", 5},
 		{"day06_test_input_3.txt", 6},
 		{"day06_test_input_4.txt", 10},
