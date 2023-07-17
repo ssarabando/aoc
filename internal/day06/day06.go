@@ -6,6 +6,9 @@ import (
 	"os"
 )
 
+const startOfPacket int = 4
+const startOfMessage int = 14
+
 // true if all chars in tail are different.
 func isSignal(tail string) bool {
 	chars := len(tail)
@@ -19,7 +22,7 @@ func isSignal(tail string) bool {
 	return true
 }
 
-func PartOne(filename string) int {
+func processMessage(filename string, markerSize int) int {
 	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -34,10 +37,10 @@ func PartOne(filename string) int {
 	for scanner.Scan() {
 		message += scanner.Text()
 		length = len(message)
-		if length < 4 {
+		if length < markerSize {
 			continue
 		}
-		if isSignal(message[length-4:]) {
+		if isSignal(message[length-markerSize:]) {
 			return length
 		}
 	}
@@ -46,4 +49,13 @@ func PartOne(filename string) int {
 	}
 
 	return 0
+
+}
+
+func PartOne(filename string) int {
+	return processMessage(filename, startOfPacket)
+}
+
+func PartTwo(filename string) int {
+	return processMessage(filename, startOfMessage)
 }

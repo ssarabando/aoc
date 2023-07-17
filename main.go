@@ -20,4 +20,5 @@ func main() {
 	fmt.Println("Day  5, part 1:", day05.PartOne("day05_input.txt"))
 	fmt.Println("Day  5, part 2:", day05.PartTwo("day05_input.txt"))
 	fmt.Println("Day  6, part 1:", day06.PartOne("day06_input.txt"))
+	fmt.Println("Day  6, part 2:", day06.PartTwo("day06_input.txt"))
 }
