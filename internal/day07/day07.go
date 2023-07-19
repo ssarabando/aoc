@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -20,11 +21,28 @@ type node struct {
 	nodeType nodeType
 	size     int
 	parent   *node
-	children []*node
+	children nodes
+}
+
+type nodes []*node
+
+func (n nodes) Len() int {
+	return len(n)
+}
+
+func (n nodes) Less(i, j int) bool {
+	return n[i].size < n[j].size
+}
+
+func (n nodes) Swap(i, j int) {
+	n[i], n[j] = n[j], n[i]
 }
 
 var input []string
 var filesystem node
+
+const totalDiskSpace int = 70_000_000
+const requiredFreeDiskSpace int = 30_000_000
 
 func readInput(filename string) {
 	file, err := os.Open(filename)
@@ -144,4 +162,21 @@ func PartOne(filename string) int {
 	}
 
 	return result
+}
+
+func PartTwo(filename string) int {
+	readInput(filename)
+	fillFilesystem()
+
+	availableDiskSpace := totalDiskSpace - filesystem.size
+	targetDiskSpace := requiredFreeDiskSpace - availableDiskSpace
+	directories := getDirs(filesystem.children)
+	sort.Sort(nodes(directories))
+	for _, directory := range directories {
+		if directory.size >= targetDiskSpace {
+			return directory.size
+		}
+	}
+
+	return filesystem.size
 }
