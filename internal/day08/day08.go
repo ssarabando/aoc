@@ -143,3 +143,7 @@ func PartOne(filename string) int {
 
 	return numberOfVisibleTrees
 }
+
+func PartTwo(filename string) int {
+	return 0
+}
