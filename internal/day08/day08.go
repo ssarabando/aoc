@@ -18,143 +18,129 @@ func (score *scenicScore) compute() int {
 	return score.top * score.left * score.right * score.bottom
 }
 
-type forest [][]int
-
-func (f *forest) countOfRows() int {
-	return len(*f)
+type scenicScores struct {
+	width           int
+	height          int
+	scenicScores    []scenicScore
+	bestScenicScore int
 }
 
-func (f *forest) countOfCols() int {
-	if f.countOfRows() > 0 {
-		return len((*f)[0])
+func (scores *scenicScores) setScenicScore(row, col int, score scenicScore) {
+	scores.scenicScores[row*scores.width+col] = score
+	currScenicScore := score.compute()
+	if scores.bestScenicScore < currScenicScore {
+		scores.bestScenicScore = currScenicScore
 	}
-	return 0
 }
 
-func (f *forest) scenicScore(row, col int) int {
-	treeHeight := (*f)[row][col]
-	rows := len(*f) - 1
-	cols := len((*f)[row]) - 1
-
-	score := scenicScore{}
-
-	pos := 0
-
-	var height int
-
-	// Compute top scenic score
-	if row > 0 {
-		pos = row - 1
-		for pos >= 0 {
-			score.top++
-			height = (*f)[pos][col]
-			if height >= treeHeight {
-				// We count a tree of equal height but mustn't count further
-				break
-			}
-			pos--
-		}
-	}
-	// Compute left scenic score
-	if col > 0 {
-		pos = col - 1
-		for pos >= 0 {
-			score.left++
-			height = (*f)[row][pos]
-			if height >= treeHeight {
-				// We count a tree of equal height but mustn't count further
-				break
-			}
-			pos--
-		}
-	}
-	// Compute right scenic score
-	if col < cols {
-		pos = col + 1
-		for pos <= cols {
-			score.right++
-			height = (*f)[row][pos]
-			if height >= treeHeight {
-				// We count a tree of equal height but mustn't count further
-				break
-			}
-			pos++
-		}
-	}
-	// Compute bottom scenic score
-	if row < rows {
-		pos = row + 1
-		for pos <= rows {
-			score.bottom++
-			height = (*f)[pos][col]
-			if height >= treeHeight {
-				// We count a tree of equal height but mustn't count further
-				break
-			}
-			pos++
-		}
-	}
-
-	return score.compute()
+type treeHeights struct {
+	width       int
+	height      int
+	treeHeights []int
 }
 
-func readTreeHeights(filename string) *[][]int {
-	trees := [][]int{}
-
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
+func newTreeHeights(size int) *treeHeights {
+	// The forest is always a square
+	return &treeHeights{
+		size,
+		size,
+		make([]int, size*size),
 	}
-	defer file.Close()
+}
 
-	var height, row int
+func (f *treeHeights) getHeight(row, col int) int {
+	return f.treeHeights[row*f.width+col]
+}
 
-	scanner := bufio.NewScanner(file)
-	row = 0
-	for scanner.Scan() {
-		line := scanner.Text()
-		numberOfTrees := len(line)
-		heights := make([]int, numberOfTrees)
-		for treeNumber, char := range line {
-			height, err = strconv.Atoi(string(char))
-			if err != nil {
-				log.Fatal(err)
-			}
-			heights[treeNumber] = height
-		}
-		trees = append(trees, heights)
-		row++
-	}
-	if err = scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-
-	return &trees
+func (f *treeHeights) setHeight(row, col, height int) {
+	f.treeHeights[row*f.width+col] = height
 }
 
 type visibleTrees struct {
-	width                uint
-	height               uint
-	data                 []uint
-	numberOfVisibleTrees uint
+	width                int
+	height               int
+	data                 []int
+	numberOfVisibleTrees int
 }
 
-func NewVisibleTrees(width, height uint) visibleTrees {
+func NewVisibleTrees(width, height int) *visibleTrees {
 	// The edges are always visible (width times two because top row and bottom
 	// row plus height times two because left column and right column minus
 	// the four corners -- we don't want to count them twice: once in the rows
 	// and another in the cols).
 	numberOfAlwaysVisibleTrees := width*2 + height*2 - 4
 
-	return visibleTrees{
+	return &visibleTrees{
 		width,
 		height,
-		make([]uint, width*height),
+		make([]int, width*height),
 		numberOfAlwaysVisibleTrees,
 	}
 }
 
-func (v *visibleTrees) markVisited(row, col uint) {
+func (source *treeHeights) newVisibleTreesFromTreeHeights() *visibleTrees {
+	dest := NewVisibleTrees(source.width, source.height)
+
+	var row, col, maxHeight, currHeight int
+
+	// Start at (1, 1), because the edges are always visible
+	row = 1
+	for row < dest.height-1 {
+		// Compute the heights from the left edge to the right:
+		maxHeight = source.getHeight(row, 0)
+		col = 1
+		for col < dest.width-1 {
+			currHeight = source.getHeight(row, col)
+			if currHeight > maxHeight {
+				maxHeight = currHeight
+				dest.markVisited(row, col)
+			}
+			col++
+		}
+		// Compute the heights from the right edge to the left
+		col = dest.width - 2
+		maxHeight = source.getHeight(row, dest.width-1)
+		for col > 0 {
+			currHeight = source.getHeight(row, col)
+			if currHeight > maxHeight {
+				maxHeight = currHeight
+				dest.markVisited(row, col)
+			}
+			col--
+		}
+		row++
+	}
+	col = 1
+	for col < dest.width-1 {
+		// Compute the heights from the top edge to the bottom
+		row = 1
+		maxHeight = source.getHeight(0, col)
+		for row < dest.height-1 {
+			currHeight = source.getHeight(row, col)
+			if currHeight > maxHeight {
+				maxHeight = currHeight
+				dest.markVisited(row, col)
+			}
+			row++
+		}
+		// Compute the heights from the bottom edge to the top
+		row = dest.height - 2
+		maxHeight = source.getHeight(dest.height-1, col)
+		for row > 0 {
+			currHeight = source.getHeight(row, col)
+			if currHeight > maxHeight {
+				maxHeight = currHeight
+				dest.markVisited(row, col)
+			}
+			row--
+		}
+		col++
+	}
+
+	return dest
+}
+
+func (v *visibleTrees) markVisited(row, col int) {
 	pos := row*v.width + col
 	if v.data[pos] != 1 {
 		v.data[pos] = 1
@@ -162,89 +148,118 @@ func (v *visibleTrees) markVisited(row, col uint) {
 	}
 }
 
-func PartOne(filename string) int {
-	treeHeights := readTreeHeights(filename)
-
-	numberOfRows := uint(len(*treeHeights))
-	numberOfCols := uint(len((*treeHeights)[0]))
-
-	// Coordinates of the trees that are visible from one of the edges
-	visibleTrees := NewVisibleTrees(numberOfRows, numberOfCols)
-
-	var maxHeight, treeHeight uint
-
-	// Excluding edges, find trees visible from left and right
-	var row, col uint
-	for row = 1; row < numberOfRows-1; row++ {
-		// Start with the left edge height
-		maxHeight = uint((*treeHeights)[row][0])
-		// Go right the current row and stop before the right edge
-		for col = 1; col < numberOfCols-1; col++ {
-			treeHeight = uint((*treeHeights)[row][col])
-			if treeHeight > maxHeight {
-				maxHeight = treeHeight
-				visibleTrees.markVisited(row, col)
-			}
-		}
-		// Now start with the right edge height
-		maxHeight = uint((*treeHeights)[row][numberOfCols-1])
-		// Go left the current row and stop before the left edge
-		for col = numberOfCols - 2; col > 0; col-- {
-			treeHeight = uint((*treeHeights)[row][col])
-			if treeHeight > maxHeight {
-				maxHeight = treeHeight
-				visibleTrees.markVisited(row, col)
-			}
-		}
-	}
-	// Excluding edges, find trees visible from top and bottom
-	for col = 1; col < numberOfCols-1; col++ {
-		// Start with the top edge height
-		maxHeight = uint((*treeHeights)[0][col])
-		// Go down the current column and stop before the bottom edge
-		for row = 1; row < numberOfRows-1; row++ {
-			treeHeight = uint((*treeHeights)[row][col])
-			if treeHeight > maxHeight {
-				maxHeight = treeHeight
-				visibleTrees.markVisited(row, col)
-			}
-		}
-		// Now with the bottom edge height
-		maxHeight = uint((*treeHeights)[numberOfRows-1][col])
-		// Go up the current column and stop before the top edge
-		for row = numberOfRows - 2; row > 0; row-- {
-			treeHeight = uint((*treeHeights)[row][col])
-			if treeHeight > maxHeight {
-				maxHeight = treeHeight
-				visibleTrees.markVisited(row, col)
-			}
-		}
+func (source *treeHeights) newScenicScoresFromTreeHeights() *scenicScores {
+	dest := scenicScores{
+		source.width,
+		source.height,
+		make([]scenicScore, source.width*source.height),
+		0,
 	}
 
-	return int(visibleTrees.numberOfVisibleTrees)
+	dest.setScenicScore(0, 0, scenicScore{})
+	dest.setScenicScore(0, source.width-1, scenicScore{})
+	dest.setScenicScore(source.height-1, 0, scenicScore{})
+	dest.setScenicScore(source.height-1, source.width-1, scenicScore{})
+
+	// Compute the scenic score of each tree.
+	// Notes that all the edges have a scenic score of 0.
+	for row := 0; row < dest.height-1; row++ {
+		for col := 0; col < dest.width-1; col++ {
+			isAtEdge := row == 0 || col == 0 || row == dest.height-1 || col == dest.width-1
+			if isAtEdge {
+				continue
+			}
+
+			currTreeHeight := source.getHeight(row, col)
+			score := scenicScore{}
+			// Compute scenic score to the top
+			for pos := row - 1; pos >= 0; pos-- {
+				score.top++
+				destTreeHeight := source.getHeight(pos, col)
+				if destTreeHeight >= currTreeHeight {
+					// We count a tree of equal height but not further
+					break
+				}
+			}
+			// Compute scenic score to the left
+			for pos := col - 1; pos >= 0; pos-- {
+				score.left++
+				destTreeHeight := source.getHeight(row, pos)
+				if destTreeHeight >= currTreeHeight {
+					// We count a tree of equal height but not further
+					break
+				}
+			}
+			// Compute scenic score to the right
+			for pos := col + 1; pos <= dest.width-1; pos++ {
+				score.right++
+				destTreeHeight := source.getHeight(row, pos)
+				if destTreeHeight >= currTreeHeight {
+					// We count a tree of equal height but not further
+					break
+				}
+			}
+			// Compute scenic score to the bottom
+			for pos := row + 1; pos <= dest.height-1; pos++ {
+				score.bottom++
+				destTreeHeight := source.getHeight(pos, col)
+				if destTreeHeight >= currTreeHeight {
+					// We count a tree of equal height but not further
+					break
+				}
+			}
+			dest.setScenicScore(row, col, score)
+		}
+	}
+
+	return &dest
 }
 
-func PartTwo(filename string) int {
-	treeHeights := readTreeHeights(filename)
-	f := (forest)(*treeHeights)
+func readTreeHeights(filename string) *treeHeights {
+	var forest *treeHeights
 
-	maxScenicScore := 0
+	file, openerr := os.Open(filename)
+	if openerr != nil {
+		log.Fatal(openerr)
+	}
+	defer file.Close()
 
-	// Only check the inner trees; the ones on the edges will
-	// always have a scenic score of 0.
-	row := 1
-	rows, cols := f.countOfRows()-1, f.countOfCols()-1
-	for row < rows {
-		col := 1
-		for col < cols {
-			treeScenicScore := f.scenicScore(row, col)
-			if treeScenicScore > maxScenicScore {
-				maxScenicScore = treeScenicScore
+	scanner := bufio.NewScanner(file)
+	row := 0
+	for scanner.Scan() {
+		line := scanner.Text()
+		if row == 0 {
+			// A forest is always a square in this case
+			forest = newTreeHeights(len(line))
+		}
+		for treeNumber, char := range line {
+			if height, err := strconv.Atoi(string(char)); err != nil {
+				log.Fatal(err)
+			} else {
+				forest.setHeight(row, treeNumber, height)
 			}
-			col++
 		}
 		row++
 	}
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
 
-	return maxScenicScore
+	return forest
+}
+
+func PartOne(filename string) int {
+	heightMap := readTreeHeights(filename)
+
+	visibilityMap := heightMap.newVisibleTreesFromTreeHeights()
+
+	return visibilityMap.numberOfVisibleTrees
+}
+
+func PartTwo(filename string) int {
+	heightMap := readTreeHeights(filename)
+
+	scenicScoreMap := heightMap.newScenicScoresFromTreeHeights()
+
+	return scenicScoreMap.bestScenicScore
 }
