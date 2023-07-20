@@ -7,6 +7,97 @@ import (
 	"strconv"
 )
 
+type scenicScore struct {
+	top    int
+	left   int
+	right  int
+	bottom int
+}
+
+func (score *scenicScore) compute() int {
+	return score.top * score.left * score.right * score.bottom
+}
+
+type forest [][]int
+
+func (f *forest) countOfRows() int {
+	return len(*f)
+}
+
+func (f *forest) countOfCols() int {
+	if f.countOfRows() > 0 {
+		return len((*f)[0])
+	}
+	return 0
+}
+
+func (f *forest) scenicScore(row, col int) int {
+	treeHeight := (*f)[row][col]
+	rows := len(*f) - 1
+	cols := len((*f)[row]) - 1
+
+	score := scenicScore{}
+
+	pos := 0
+
+	var height int
+
+	// Compute top scenic score
+	if row > 0 {
+		pos = row - 1
+		for pos >= 0 {
+			score.top++
+			height = (*f)[pos][col]
+			if height >= treeHeight {
+				// We count a tree of equal height but mustn't count further
+				break
+			}
+			pos--
+		}
+	}
+	// Compute left scenic score
+	if col > 0 {
+		pos = col - 1
+		for pos >= 0 {
+			score.left++
+			height = (*f)[row][pos]
+			if height >= treeHeight {
+				// We count a tree of equal height but mustn't count further
+				break
+			}
+			pos--
+		}
+	}
+	// Compute right scenic score
+	if col < cols {
+		pos = col + 1
+		for pos <= cols {
+			score.right++
+			height = (*f)[row][pos]
+			if height >= treeHeight {
+				// We count a tree of equal height but mustn't count further
+				break
+			}
+			pos++
+		}
+	}
+	// Compute bottom scenic score
+	if row < rows {
+		pos = row + 1
+		for pos <= rows {
+			score.bottom++
+			height = (*f)[pos][col]
+			if height >= treeHeight {
+				// We count a tree of equal height but mustn't count further
+				break
+			}
+			pos++
+		}
+	}
+
+	return score.compute()
+}
+
 func readTreeHeights(filename string) *[][]int {
 	trees := [][]int{}
 
@@ -145,5 +236,26 @@ func PartOne(filename string) int {
 }
 
 func PartTwo(filename string) int {
-	return 0
+	treeHeights := readTreeHeights(filename)
+	f := (forest)(*treeHeights)
+
+	maxScenicScore := 0
+
+	// Only check the inner trees; the ones on the edges will
+	// always have a scenic score of 0.
+	row := 1
+	rows, cols := f.countOfRows()-1, f.countOfCols()-1
+	for row < rows {
+		col := 1
+		for col < cols {
+			treeScenicScore := f.scenicScore(row, col)
+			if treeScenicScore > maxScenicScore {
+				maxScenicScore = treeScenicScore
+			}
+			col++
+		}
+		row++
+	}
+
+	return maxScenicScore
 }
