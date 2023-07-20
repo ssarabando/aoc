@@ -12,7 +12,7 @@ import (
 type nodeType int
 
 const (
-	Directory = iota
+	Directory nodeType = iota
 	File
 )
 
