@@ -132,107 +132,96 @@ func readTreeHeights(filename string) *[][]int {
 	return &trees
 }
 
-type coord struct {
-	row int
-	col int
+type visibleTrees struct {
+	width                uint
+	height               uint
+	data                 []uint
+	numberOfVisibleTrees uint
 }
 
-type coordinates []coord
+func NewVisibleTrees(width, height uint) visibleTrees {
+	// The edges are always visible (width times two because top row and bottom
+	// row plus height times two because left column and right column minus
+	// the four corners -- we don't want to count them twice: once in the rows
+	// and another in the cols).
+	numberOfAlwaysVisibleTrees := width*2 + height*2 - 4
 
-func (trees *coordinates) contains(row, col int) bool {
-	for _, coord := range *trees {
-		if coord.row != row {
-			continue
-		}
-		if coord.col == col {
-			return true
-		}
+	return visibleTrees{
+		width,
+		height,
+		make([]uint, width*height),
+		numberOfAlwaysVisibleTrees,
 	}
-	return false
 }
 
-func (trees *coordinates) tryAdd(row, col int) bool {
-	if trees.contains(row, col) {
-		return false
+func (v *visibleTrees) markVisited(row, col uint) {
+	pos := row*v.width + col
+	if v.data[pos] != 1 {
+		v.data[pos] = 1
+		v.numberOfVisibleTrees++
 	}
-	coords := (*[]coord)(trees)
-	*coords = append(*coords, coord{row, col})
-	return true
-}
-
-func (trees *coordinates) len() int {
-	return len(*trees)
 }
 
 func PartOne(filename string) int {
-	numberOfVisibleTrees := 0
-
 	treeHeights := readTreeHeights(filename)
 
-	numberOfRows := len(*treeHeights)
-	numberOfCols := len((*treeHeights)[0])
-
-	// The outside trees are always visible.
-	// That includes the top and bottom rows...
-	numberOfVisibleTrees += numberOfRows*2 - 2
-	// ... and the 1st and last columns.
-	numberOfVisibleTrees += numberOfCols*2 - 2
+	numberOfRows := uint(len(*treeHeights))
+	numberOfCols := uint(len((*treeHeights)[0]))
 
 	// Coordinates of the trees that are visible from one of the edges
-	coords := coordinates{}
+	visibleTrees := NewVisibleTrees(numberOfRows, numberOfCols)
 
-	var maxHeight, treeHeight int
+	var maxHeight, treeHeight uint
 
 	// Excluding edges, find trees visible from left and right
-	for row := 1; row < numberOfRows-1; row++ {
+	var row, col uint
+	for row = 1; row < numberOfRows-1; row++ {
 		// Start with the left edge height
-		maxHeight = (*treeHeights)[row][0]
+		maxHeight = uint((*treeHeights)[row][0])
 		// Go right the current row and stop before the right edge
-		for col := 1; col < numberOfCols-1; col++ {
-			treeHeight = (*treeHeights)[row][col]
+		for col = 1; col < numberOfCols-1; col++ {
+			treeHeight = uint((*treeHeights)[row][col])
 			if treeHeight > maxHeight {
 				maxHeight = treeHeight
-				coords.tryAdd(row, col)
+				visibleTrees.markVisited(row, col)
 			}
 		}
 		// Now start with the right edge height
-		maxHeight = (*treeHeights)[row][numberOfCols-1]
+		maxHeight = uint((*treeHeights)[row][numberOfCols-1])
 		// Go left the current row and stop before the left edge
-		for col := numberOfCols - 2; col > 0; col-- {
-			treeHeight = (*treeHeights)[row][col]
+		for col = numberOfCols - 2; col > 0; col-- {
+			treeHeight = uint((*treeHeights)[row][col])
 			if treeHeight > maxHeight {
 				maxHeight = treeHeight
-				coords.tryAdd(row, col)
+				visibleTrees.markVisited(row, col)
 			}
 		}
 	}
 	// Excluding edges, find trees visible from top and bottom
-	for col := 1; col < numberOfCols-1; col++ {
+	for col = 1; col < numberOfCols-1; col++ {
 		// Start with the top edge height
-		maxHeight = (*treeHeights)[0][col]
+		maxHeight = uint((*treeHeights)[0][col])
 		// Go down the current column and stop before the bottom edge
-		for row := 1; row < numberOfRows-1; row++ {
-			treeHeight = (*treeHeights)[row][col]
+		for row = 1; row < numberOfRows-1; row++ {
+			treeHeight = uint((*treeHeights)[row][col])
 			if treeHeight > maxHeight {
 				maxHeight = treeHeight
-				coords.tryAdd(row, col)
+				visibleTrees.markVisited(row, col)
 			}
 		}
 		// Now with the bottom edge height
-		maxHeight = (*treeHeights)[numberOfRows-1][col]
+		maxHeight = uint((*treeHeights)[numberOfRows-1][col])
 		// Go up the current column and stop before the top edge
-		for row := numberOfRows - 2; row > 0; row-- {
-			treeHeight = (*treeHeights)[row][col]
+		for row = numberOfRows - 2; row > 0; row-- {
+			treeHeight = uint((*treeHeights)[row][col])
 			if treeHeight > maxHeight {
 				maxHeight = treeHeight
-				coords.tryAdd(row, col)
+				visibleTrees.markVisited(row, col)
 			}
 		}
 	}
 
-	numberOfVisibleTrees += coords.len()
-
-	return numberOfVisibleTrees
+	return int(visibleTrees.numberOfVisibleTrees)
 }
 
 func PartTwo(filename string) int {
