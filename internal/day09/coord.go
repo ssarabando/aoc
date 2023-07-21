@@ -18,7 +18,6 @@ func abs(value int) int {
 // Left decrements x.
 // Right increments x.
 // Down increments y.
-//
 type coord struct {
 	x, y int
 }
@@ -75,6 +74,30 @@ func (source *coord) isAdjacent(dest *coord) bool {
 	vertDistance := abs(source.y - dest.y)
 	horzDistance := abs(source.x - dest.x)
 	return vertDistance <= 1 && horzDistance <= 1
+}
+
+func (tail *coord) follow(head *coord) {
+	if head.isDirectlyUp(tail) {
+		tail.moveUp()
+	} else if head.isDirectlyLeft(tail) {
+		tail.moveLeft()
+	} else if head.isDirectlyRight(tail) {
+		tail.moveRight()
+	} else if head.isDirectlyDown(tail) {
+		tail.moveDown()
+	} else if head.isUp(tail) && head.isLeft(tail) {
+		tail.moveUp()
+		tail.moveLeft()
+	} else if head.isLeft(tail) && head.isDown(tail) {
+		tail.moveLeft()
+		tail.moveDown()
+	} else if head.isDown(tail) && head.isRight(tail) {
+		tail.moveDown()
+		tail.moveRight()
+	} else if head.isRight(tail) && head.isUp(tail) {
+		tail.moveRight()
+		tail.moveUp()
+	}
 }
 
 type listOfCoords struct {
