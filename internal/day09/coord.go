@@ -39,12 +39,36 @@ func (c *coord) moveDown() {
 	c.y += 1
 }
 
-func (target *coord) alignHorizontallyWith(source *coord) {
-	target.y = source.y
+func (source *coord) isDirectlyUp(target *coord) bool {
+	return source.y < target.y && source.x == target.x
 }
 
-func (target *coord) alignVerticallyWith(source *coord) {
-	target.x = source.x
+func (source *coord) isDirectlyDown(target *coord) bool {
+	return source.y > target.y && source.x == target.x
+}
+
+func (source *coord) isDirectlyLeft(target *coord) bool {
+	return source.x < target.x && source.y == target.y
+}
+
+func (source *coord) isDirectlyRight(target *coord) bool {
+	return source.x > target.x && source.y == target.y
+}
+
+func (source *coord) isUp(target *coord) bool {
+	return source.y < target.y
+}
+
+func (source *coord) isLeft(target *coord) bool {
+	return source.x < target.x
+}
+
+func (source *coord) isRight(target *coord) bool {
+	return source.x > target.x
+}
+
+func (source *coord) isDown(target *coord) bool {
+	return source.y > target.y
 }
 
 func (source *coord) isAdjacent(dest *coord) bool {
@@ -63,8 +87,8 @@ func newListOfCoords() *listOfCoords {
 	}
 }
 
-func (l *listOfCoords) markVisited(coord coord) {
-	if _, found := l.coords[coord]; !found {
-		l.coords[coord] = true
+func (l *listOfCoords) markVisited(coord *coord) {
+	if _, found := l.coords[*coord]; !found {
+		l.coords[*coord] = true
 	}
 }

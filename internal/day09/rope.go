@@ -1,58 +1,99 @@
 package day09
 
 type rope struct {
-	head coord
-	tail coord
+	knots []coord
 }
 
-func (r *rope) isStraight() bool {
-	return r.head.x == r.tail.x || r.head.y == r.tail.y
+func newRope(size int) *rope {
+	if size < 2 {
+		size = 2
+	}
+
+	return &rope{
+		make([]coord, size),
+	}
 }
 
-func (r *rope) makeHorizontal() {
-	r.tail.alignHorizontallyWith(&r.head)
+func (r *rope) size() int {
+	return len(r.knots)
 }
 
-func (r *rope) makeVertical() {
-	r.tail.alignVerticallyWith(&r.head)
+func (r *rope) getHead() *coord {
+	return &r.knots[0]
+}
+
+func (r *rope) getTail() *coord {
+	return &r.knots[r.size()-1]
+}
+
+func (tail *coord) follow(head *coord) {
+	if head.isDirectlyUp(tail) {
+		tail.moveUp()
+	} else if head.isDirectlyLeft(tail) {
+		tail.moveLeft()
+	} else if head.isDirectlyRight(tail) {
+		tail.moveRight()
+	} else if head.isDirectlyDown(tail) {
+		tail.moveDown()
+	} else if head.isUp(tail) && head.isLeft(tail) {
+		tail.moveUp()
+		tail.moveLeft()
+	} else if head.isLeft(tail) && head.isDown(tail) {
+		tail.moveLeft()
+		tail.moveDown()
+	} else if head.isDown(tail) && head.isRight(tail) {
+		tail.moveDown()
+		tail.moveRight()
+	} else if head.isRight(tail) && head.isUp(tail) {
+		tail.moveRight()
+		tail.moveUp()
+	}
 }
 
 func (r *rope) moveUp() {
-	r.head.moveUp()
-	if !r.head.isAdjacent(&r.tail) {
-		r.tail.moveUp()
-		if !r.isStraight() {
-			r.makeVertical()
+	prev := r.getHead()
+	prev.moveUp()
+	for pos := 1; pos < r.size(); pos++ {
+		curr := &r.knots[pos]
+		if !curr.isAdjacent(prev) {
+			curr.follow(prev)
 		}
+		prev = curr
 	}
 }
 
 func (r *rope) moveLeft() {
-	r.head.moveLeft()
-	if !r.head.isAdjacent(&r.tail) {
-		r.tail.moveLeft()
-		if !r.isStraight() {
-			r.makeHorizontal()
+	prev := r.getHead()
+	prev.moveLeft()
+	for pos := 1; pos < r.size(); pos++ {
+		curr := &r.knots[pos]
+		if !curr.isAdjacent(prev) {
+			curr.follow(prev)
 		}
+		prev = curr
 	}
 }
 
 func (r *rope) moveRight() {
-	r.head.moveRight()
-	if !r.head.isAdjacent(&r.tail) {
-		r.tail.moveRight()
-		if !r.isStraight() {
-			r.makeHorizontal()
+	prev := r.getHead()
+	prev.moveRight()
+	for pos := 1; pos < r.size(); pos++ {
+		curr := &r.knots[pos]
+		if !curr.isAdjacent(prev) {
+			curr.follow(prev)
 		}
+		prev = curr
 	}
 }
 
 func (r *rope) moveDown() {
-	r.head.moveDown()
-	if !r.head.isAdjacent(&r.tail) {
-		r.tail.moveDown()
-		if !r.isStraight() {
-			r.makeVertical()
+	prev := r.getHead()
+	prev.moveDown()
+	for pos := 1; pos < r.size(); pos++ {
+		curr := &r.knots[pos]
+		if !curr.isAdjacent(prev) {
+			curr.follow(prev)
 		}
+		prev = curr
 	}
 }
