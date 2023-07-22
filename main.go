@@ -11,6 +11,7 @@ import (
 	"github.com/ssarabando/go_advent_of_code_2022/internal/day07"
 	"github.com/ssarabando/go_advent_of_code_2022/internal/day08"
 	"github.com/ssarabando/go_advent_of_code_2022/internal/day09"
+	"github.com/ssarabando/go_advent_of_code_2022/internal/day10"
 )
 
 func main() {
@@ -30,4 +31,5 @@ func main() {
 	fmt.Println("Day  8, part 2:", day08.PartTwo("day08_input.txt"))
 	fmt.Println("Day  9, part 1:", day09.PartOne("day09_input.txt"))
 	fmt.Println("Day  9, part 2:", day09.PartTwo("day09_input.txt"))
+	fmt.Println("Day 10, part 1:", day10.PartOne("day10_input.txt"))
 }
