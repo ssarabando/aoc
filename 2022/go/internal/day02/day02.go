@@ -18,12 +18,11 @@ const (
 	score_won  int = 6
 )
 
-func PartTwo(lines []string) int {
-	rock := Shape{"Rock"}
-	paper := Shape{"Paper"}
-	scissors := Shape{"Scissors"}
-
-	game_scores := map[Play]int{
+var (
+	rock        = Shape{"Rock"}
+	paper       = Shape{"Paper"}
+	scissors    = Shape{"Scissors"}
+	game_scores = map[Play]int{
 		{rock, scissors}:     score_lost,
 		{scissors, paper}:    score_lost,
 		{paper, rock}:        score_lost,
@@ -34,37 +33,58 @@ func PartTwo(lines []string) int {
 		{paper, scissors}:    score_won,
 		{rock, paper}:        score_won,
 	}
-
-	losing_plays := map[Shape]Shape{
+	losing_plays = map[Shape]Shape{
 		rock:     scissors,
 		scissors: paper,
 		paper:    rock,
 	}
-
-	draw_plays := map[Shape]Shape{
+	draw_plays = map[Shape]Shape{
 		rock:     rock,
 		scissors: scissors,
 		paper:    paper,
 	}
-
-	winning_plays := map[Shape]Shape{
+	winning_plays = map[Shape]Shape{
 		rock:     paper,
 		paper:    scissors,
 		scissors: rock,
 	}
-
-	shape_scores := map[Shape]int{
+	shape_scores = map[Shape]int{
 		rock:     1,
 		paper:    2,
 		scissors: 3,
 	}
-
-	opponent_shapes := map[rune]Shape{
+	opponent_shapes = map[rune]Shape{
 		'A': rock,
 		'B': paper,
 		'C': scissors,
 	}
+	shapes = map[string]Shape{
+		"A": rock,
+		"B": paper,
+		"C": scissors,
+		"X": rock,
+		"Y": paper,
+		"Z": scissors,
+	}
+)
 
+func PartOne(lines []string) int {
+	total_score := 0
+
+	for _, line := range lines {
+		if line == "" {
+			break
+		}
+		other_choice, my_choice := line[0:1], line[2:3]
+		play := Play{shapes[other_choice], shapes[my_choice]}
+		outcome := game_scores[play]
+		total_score += shape_scores[shapes[my_choice]] + outcome
+	}
+
+	return total_score
+}
+
+func PartTwo(lines []string) int {
 	var total_score int
 
 	for _, line := range lines {

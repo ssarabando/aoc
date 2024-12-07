@@ -33,7 +33,11 @@ func main() {
 		fmt.Println("Day  1, part 1:", day01.PartOne(lines))
 		fmt.Println("Day  1, part 2:", day01.PartTwo(lines))
 	}
-	fmt.Println("Day  2, part 2:", day02.PartTwo(getContents("../day02_input.txt")))
+	{
+		lines := getContents("../day02_input.txt")
+		fmt.Println("Day  2, part 1:", day02.PartOne(lines))
+		fmt.Println("Day  2, part 2:", day02.PartTwo(lines))
+	}
 	{
 		lines := getContents("../day03_input.txt")
 		fmt.Println("Day  3, part 1:", day03.PartOne(lines))
