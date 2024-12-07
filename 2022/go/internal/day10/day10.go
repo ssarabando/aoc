@@ -1,9 +1,7 @@
 package day10
 
 import (
-	"bufio"
 	"log"
-	"os"
 	"strconv"
 )
 
@@ -15,21 +13,15 @@ func computeSignalStrength(cycle, x int) int {
 	return 0
 }
 
-func PartOne(filename string) int {
-	file, openErr := os.Open(filename)
-	if openErr != nil {
-		log.Fatal(openErr)
-	}
-	defer file.Close()
-
+func PartOne(lines []string) int {
 	cycle := 0
 	x := 1
 	result := 0
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-
+	for _, line := range lines {
+		if line == "" {
+			break
+		}
 		if line == "noop" {
 			cycle++
 			result += computeSignalStrength(cycle, x)
@@ -47,15 +39,12 @@ func PartOne(filename string) int {
 			}
 		}
 	}
-	if scanError := scanner.Err(); scanError != nil {
-		log.Fatal(scanError)
-	}
 
 	return result
 }
 
-func PartTwo(filename string) string {
-	program := *readProgram(filename)
+func PartTwo(lines []string) string {
+	program := *readProgram(lines)
 
 	screen := makeScreen(40, 6)
 

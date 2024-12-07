@@ -1,24 +1,22 @@
 package day08
 
 import (
-	"bufio"
 	"log"
-	"os"
-    "strconv"
+	"strconv"
 )
 
 type treeHeights struct {
+	treeHeights []int
 	width       int
 	height      int
-	treeHeights []int
 }
 
 func newTreeHeights(size int) *treeHeights {
 	// The forest is always a square
 	return &treeHeights{
-		size,
-		size,
 		make([]int, size*size),
+		size,
+		size,
 	}
 }
 
@@ -30,19 +28,11 @@ func (f *treeHeights) setHeight(row, col, height int) {
 	f.treeHeights[row*f.width+col] = height
 }
 
-func readTreeHeights(filename string) *treeHeights {
+func readTreeHeights(lines []string) *treeHeights {
 	var forest *treeHeights
 
-	file, openerr := os.Open(filename)
-	if openerr != nil {
-		log.Fatal(openerr)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
 	row := 0
-	for scanner.Scan() {
-		line := scanner.Text()
+	for _, line := range lines {
 		if row == 0 {
 			// A forest is always a square in this case
 			forest = newTreeHeights(len(line))
@@ -55,9 +45,6 @@ func readTreeHeights(filename string) *treeHeights {
 			}
 		}
 		row++
-	}
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
 	}
 
 	return forest

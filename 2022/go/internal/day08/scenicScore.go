@@ -12,9 +12,9 @@ func (score *scenicScore) compute() int {
 }
 
 type scenicScores struct {
+	scenicScores    []scenicScore
 	width           int
 	height          int
-	scenicScores    []scenicScore
 	bestScenicScore int
 }
 
@@ -28,9 +28,9 @@ func (scores *scenicScores) setScenicScore(row, col int, score scenicScore) {
 
 func (source *treeHeights) newScenicScoresFromTreeHeights() *scenicScores {
 	dest := scenicScores{
+		make([]scenicScore, source.width*source.height),
 		source.width,
 		source.height,
-		make([]scenicScore, source.width*source.height),
 		0,
 	}
 

@@ -1,9 +1,6 @@
 package day02
 
 import (
-	"bufio"
-	"log"
-	"os"
 	"strings"
 )
 
@@ -15,16 +12,18 @@ type Play struct {
 	opponent, mine Shape
 }
 
-const score_lost int = 0
-const score_draw int = 3
-const score_won int = 6
+const (
+	score_lost int = 0
+	score_draw int = 3
+	score_won  int = 6
+)
 
-func PartTwo(filename string) int {
-	var rock = Shape{"Rock"}
-	var paper = Shape{"Paper"}
-	var scissors = Shape{"Scissors"}
+func PartTwo(lines []string) int {
+	rock := Shape{"Rock"}
+	paper := Shape{"Paper"}
+	scissors := Shape{"Scissors"}
 
-	var game_scores = map[Play]int{
+	game_scores := map[Play]int{
 		{rock, scissors}:     score_lost,
 		{scissors, paper}:    score_lost,
 		{paper, rock}:        score_lost,
@@ -36,47 +35,44 @@ func PartTwo(filename string) int {
 		{rock, paper}:        score_won,
 	}
 
-	var losing_plays = map[Shape]Shape{
+	losing_plays := map[Shape]Shape{
 		rock:     scissors,
 		scissors: paper,
 		paper:    rock,
 	}
 
-	var draw_plays = map[Shape]Shape{
+	draw_plays := map[Shape]Shape{
 		rock:     rock,
 		scissors: scissors,
 		paper:    paper,
 	}
 
-	var winning_plays = map[Shape]Shape{
+	winning_plays := map[Shape]Shape{
 		rock:     paper,
 		paper:    scissors,
 		scissors: rock,
 	}
 
-	var shape_scores = map[Shape]int{
+	shape_scores := map[Shape]int{
 		rock:     1,
 		paper:    2,
 		scissors: 3,
 	}
 
-	var opponent_shapes = map[rune]Shape{
+	opponent_shapes := map[rune]Shape{
 		'A': rock,
 		'B': paper,
 		'C': scissors,
 	}
 
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
 	var total_score int
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		current_play := strings.Fields(scanner.Text())
+	for _, line := range lines {
+		if line == "" {
+			break
+		}
+
+		current_play := strings.Fields(line)
 
 		opponent_play, my_play := rune(current_play[0][0]), rune(current_play[1][0])
 

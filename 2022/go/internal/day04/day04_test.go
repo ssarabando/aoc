@@ -45,7 +45,7 @@ func TestContains(t *testing.T) {
 }
 
 func TestOverlaps(t *testing.T) {
-	overlaps := PartTwo("day04_test_input.txt")
+	overlaps := PartTwo([]string{"2-4,6-8", "2-3,4-5", "5-7,7-9", "2-8,3-7", "6-6,4-6", "2-6,4-8"})
 	if overlaps != 4 {
 		t.Fatalf(`Part 2: number of overlaps should be 4 but was %d.`, overlaps)
 	}
@@ -68,7 +68,7 @@ func TestPairCreation(t *testing.T) {
 }
 
 func TestPartOneWithSmallDataset(t *testing.T) {
-	overlapping_pairs := PartOne("day04_test_input.txt")
+	overlapping_pairs := PartOne([]string{"2-4,6-8", "2-3,4-5", "5-7,7-9", "2-8,3-7", "6-6,4-6", "2-6,4-8"})
 	if overlapping_pairs == 0 {
 		t.Fatalf(`Number of test overlapping pairs should be 2. Was %d.`, overlapping_pairs)
 	}

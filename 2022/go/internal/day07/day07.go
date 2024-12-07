@@ -1,9 +1,7 @@
 package day07
 
 import (
-	"bufio"
 	"log"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -17,11 +15,11 @@ const (
 )
 
 type node struct {
+	parent   *node
 	name     string
+	children nodes
 	nodeType nodeType
 	size     int
-	parent   *node
-	children nodes
 }
 
 type nodes []*node
@@ -38,41 +36,28 @@ func (n nodes) Swap(i, j int) {
 	n[i], n[j] = n[j], n[i]
 }
 
-var input []string
 var filesystem node
 
-const totalDiskSpace int = 70_000_000
-const requiredFreeDiskSpace int = 30_000_000
+const (
+	totalDiskSpace        int = 70_000_000
+	requiredFreeDiskSpace int = 30_000_000
+)
 
-func readInput(filename string) {
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	input = []string{}
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		input = append(input, scanner.Text())
-	}
-	if err = scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func fillFilesystem() {
+func fillFilesystem(lines []string) {
 	filesystem = node{
+		nil,
 		"/",
+		[]*node{},
 		Directory,
 		0,
-		nil,
-		[]*node{},
 	}
 
 	currentDirectory := &filesystem
 
-	for _, line := range input[1:] {
+	for _, line := range lines {
+		if line == "" {
+			break
+		}
 		if line[:4] == "$ cd" {
 			if line[5] == '/' {
 				currentDirectory = &filesystem
@@ -95,11 +80,11 @@ func fillFilesystem() {
 		if line[:3] == "dir" {
 			newDirectoryName := line[4:]
 			directory := &node{
+				currentDirectory,
 				newDirectoryName,
+				[]*node{},
 				Directory,
 				0,
-				currentDirectory,
-				[]*node{},
 			}
 			currentDirectory.children = append(
 				currentDirectory.children,
@@ -114,11 +99,11 @@ func fillFilesystem() {
 		}
 
 		fileNode := &node{
+			currentDirectory,
 			fileData[1],
+			nil,
 			File,
 			size,
-			currentDirectory,
-			nil,
 		}
 		currentDirectory.size += size
 		currentDirectory.children = append(
@@ -147,9 +132,8 @@ func getDirs(nodes []*node) []*node {
 	return result
 }
 
-func PartOne(filename string) int {
-	readInput(filename)
-	fillFilesystem()
+func PartOne(lines []string) int {
+	fillFilesystem(lines)
 
 	result := 0
 
@@ -164,9 +148,8 @@ func PartOne(filename string) int {
 	return result
 }
 
-func PartTwo(filename string) int {
-	readInput(filename)
-	fillFilesystem()
+func PartTwo(lines []string) int {
+	fillFilesystem(lines)
 
 	availableDiskSpace := totalDiskSpace - filesystem.size
 	targetDiskSpace := requiredFreeDiskSpace - availableDiskSpace

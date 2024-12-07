@@ -1,9 +1,9 @@
 package day08
 
 type visibleTrees struct {
+	data                 []int
 	width                int
 	height               int
-	data                 []int
 	numberOfVisibleTrees int
 }
 
@@ -15,9 +15,9 @@ func NewVisibleTrees(width, height int) *visibleTrees {
 	numberOfAlwaysVisibleTrees := width*2 + height*2 - 4
 
 	return &visibleTrees{
+		make([]int, width*height),
 		width,
 		height,
-		make([]int, width*height),
 		numberOfAlwaysVisibleTrees,
 	}
 }

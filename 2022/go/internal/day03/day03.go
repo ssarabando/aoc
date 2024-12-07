@@ -1,9 +1,6 @@
 package day03
 
 import (
-	"bufio"
-	"log"
-	"os"
 	"strings"
 )
 
@@ -38,36 +35,9 @@ func group_priorities(elf_1_items string, elf_2_items string, elf_3_items string
 	return 0
 }
 
-func readData(filename string) []string {
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	results := make([]string, 0)
-
-	scanner := bufio.NewScanner(file)
-	for {
-		if ok := scanner.Scan(); !ok {
-			break
-		}
-		// Grow results by one
-		l := len(results)
-		newResults := make([]string, l+1)
-		copy(newResults, results)
-		results = newResults
-		// Append line to results
-		results[l] = scanner.Text()
-	}
-
-	return results
-}
-
-func PartOne(filename string) int {
+func PartOne(lines []string) int {
 	result := 0
 
-	lines := readData(filename)
 	for _, line := range lines {
 		result += line_priority(line)
 	}
@@ -75,10 +45,9 @@ func PartOne(filename string) int {
 	return result
 }
 
-func PartTwo(filename string) int {
+func PartTwo(lines []string) int {
 	result := 0
 
-	lines := readData(filename)
 	number_of_lines := len(lines)
 	for line_number := 2; line_number < number_of_lines; line_number += 3 {
 		result += group_priorities(lines[line_number-2], lines[line_number-1], lines[line_number])

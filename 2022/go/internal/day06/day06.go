@@ -1,13 +1,9 @@
 package day06
 
-import (
-	"bufio"
-	"log"
-	"os"
+const (
+	startOfPacket  int = 4
+	startOfMessage int = 14
 )
-
-const startOfPacket int = 4
-const startOfMessage int = 14
 
 // true if all chars in tail are different.
 func isSignal(tail string) bool {
@@ -22,40 +18,30 @@ func isSignal(tail string) bool {
 	return true
 }
 
-func processMessage(filename string, markerSize int) int {
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
+func processMessage(lines []string, markerSize int) int {
 	var message string
 	var length int
 
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanRunes)
-	for scanner.Scan() {
-		message += scanner.Text()
-		length = len(message)
-		if length < markerSize {
-			continue
+	for _, line := range lines {
+		for _, rune := range line {
+			message += string(rune)
+			length = len(message)
+			if length < markerSize {
+				continue
+			}
+			if isSignal(message[length-markerSize:]) {
+				return length
+			}
 		}
-		if isSignal(message[length-markerSize:]) {
-			return length
-		}
-	}
-	if err = scanner.Err(); err != nil {
-		log.Fatal(err)
 	}
 
 	return 0
-
 }
 
-func PartOne(filename string) int {
-	return processMessage(filename, startOfPacket)
+func PartOne(lines []string) int {
+	return processMessage(lines, startOfPacket)
 }
 
-func PartTwo(filename string) int {
-	return processMessage(filename, startOfMessage)
+func PartTwo(lines []string) int {
+	return processMessage(lines, startOfMessage)
 }

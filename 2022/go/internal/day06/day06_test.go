@@ -1,47 +1,58 @@
 package day06
 
 import (
+	"log"
+	"os"
+	"strings"
 	"testing"
 )
 
+func getContents(filename string) []string {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return strings.Split(string(data), "\r\n")
+}
+
 func TestPartOne(t *testing.T) {
 	tests := []struct {
-		filename string
+		data     string
 		expected int
 	}{
-		{"day06_test_input_1.txt", 7},
-		{"day06_test_input_2.txt", 5},
-		{"day06_test_input_3.txt", 6},
-		{"day06_test_input_4.txt", 10},
-		{"day06_test_input_5.txt", 11},
+		{"mjqjpqmgbljsphdztnvjfqwrcgsmlb", 7},
+		{"bvwbjplbgvbhsrlpgdmjqwftvncz", 5},
+		{"nppdvjthqldpwncqszvftbrmjlhg", 6},
+		{"nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 10},
+		{"zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 11},
 	}
 	for _, test := range tests {
-		filename := test.filename
-		actual := PartOne(filename)
+		data := test.data
+		actual := PartOne([]string{data})
 		expected := test.expected
 		if actual != expected {
-			t.Fatalf(`%s: expected %d; found %d`, filename, expected, actual)
+			t.Fatalf(`%s: expected %d; found %d`, data, expected, actual)
 		}
 	}
 }
 
 func TestPartTwo(t *testing.T) {
 	tests := []struct {
-		filename string
+		data     string
 		expected int
 	}{
-		{"day06_test_input_6.txt", 19},
-		{"day06_test_input_7.txt", 23},
-		{"day06_test_input_8.txt", 23},
-		{"day06_test_input_9.txt", 29},
-		{"day06_test_input_10.txt", 26},
+		{"mjqjpqmgbljsphdztnvjfqwrcgsmlb", 19},
+		{"bvwbjplbgvbhsrlpgdmjqwftvncz", 23},
+		{"nppdvjthqldpwncqszvftbrmjlhg", 23},
+		{"nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29},
+		{"zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26},
 	}
 	for _, test := range tests {
-		filename := test.filename
-		actual := PartTwo(filename)
+		data := test.data
+		actual := PartTwo([]string{data})
 		expected := test.expected
 		if actual != expected {
-			t.Fatalf(`%s: expected %d; found %d`, filename, expected, actual)
+			t.Fatalf(`%s: expected %d; found %d`, data, expected, actual)
 		}
 	}
 }

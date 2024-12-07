@@ -1,15 +1,15 @@
 package day08
 
-func PartOne(filename string) int {
-	heightMap := readTreeHeights(filename)
+func PartOne(lines []string) int {
+	heightMap := readTreeHeights(lines)
 
 	visibilityMap := heightMap.newVisibleTreesFromTreeHeights()
 
 	return visibilityMap.numberOfVisibleTrees
 }
 
-func PartTwo(filename string) int {
-	heightMap := readTreeHeights(filename)
+func PartTwo(lines []string) int {
+	heightMap := readTreeHeights(lines)
 
 	scenicScoreMap := heightMap.newScenicScoresFromTreeHeights()
 

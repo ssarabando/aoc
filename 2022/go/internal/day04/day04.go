@@ -1,9 +1,7 @@
 package day04
 
 import (
-	"bufio"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -65,33 +63,23 @@ func appendPair(pairs []pair, newPair *pair) []pair {
 	return pairs
 }
 
-func readInputFile(filename string) []pair {
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
+func mapLinesToPairs(lines []string) []pair {
 	pairs := make([]pair, 0)
 
-	scanner := bufio.NewScanner(file)
-	for {
-		if success := scanner.Scan(); !success {
+	for _, line := range lines {
+		if line == "" {
 			break
 		}
-		pair := NewPair(scanner.Text())
+		pair := NewPair(line)
 		pairs = appendPair(pairs, pair)
-	}
-	if err = scanner.Err(); err != nil {
-		log.Fatal(err)
 	}
 
 	return pairs
 }
 
-func PartOne(filename string) int {
+func PartOne(lines []string) int {
 	overlapping_pairs := 0
-	pairs := readInputFile(filename)
+	pairs := mapLinesToPairs(lines)
 	for _, pair := range pairs {
 		if pair.Elf1.Contains(pair.Elf2) || pair.Elf2.Contains(pair.Elf1) {
 			overlapping_pairs += 1
@@ -100,9 +88,9 @@ func PartOne(filename string) int {
 	return overlapping_pairs
 }
 
-func PartTwo(filename string) int {
+func PartTwo(lines []string) int {
 	overlapping_pairs := 0
-	pairs := readInputFile(filename)
+	pairs := mapLinesToPairs(lines)
 	for _, pair := range pairs {
 		if pair.Elf1.Overlaps(pair.Elf2) || pair.Elf2.Overlaps(pair.Elf1) {
 			overlapping_pairs += 1

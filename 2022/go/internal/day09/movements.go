@@ -1,10 +1,8 @@
 package day09
 
 import (
-	"bufio"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 )
 
@@ -58,22 +56,14 @@ func (movs *movements) add(mov movement) {
 	*movs = append(*movs, &mov)
 }
 
-func readMovements(filename string) movements {
+func readMovements(lines []string) movements {
 	movs := movements{}
 
-	if file, openerr := os.Open(filename); openerr != nil {
-		log.Fatal(openerr)
-	} else {
-		defer file.Close()
-
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			line := scanner.Text()
-			movs.add(newMovementFromString(line))
+	for _, line := range lines {
+		if line == "" {
+			break
 		}
-		if scanerr := scanner.Err(); scanerr != nil {
-			log.Fatal(scanerr)
-		}
+		movs.add(newMovementFromString(line))
 	}
 
 	return movs

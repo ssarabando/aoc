@@ -1,7 +1,7 @@
 package day09
 
-func PartOne(filename string) int {
-	movs := readMovements(filename)
+func PartOne(lines []string, filename string) int {
+	movs := readMovements(lines)
 
 	rope := newRope(2)
 
@@ -41,8 +41,8 @@ func PartOne(filename string) int {
 	return len(coords.coords)
 }
 
-func PartTwo(filename string) int {
-	movs := readMovements(filename)
+func PartTwo(lines []string) int {
+	movs := readMovements(lines)
 
 	rope := newRope(10)
 

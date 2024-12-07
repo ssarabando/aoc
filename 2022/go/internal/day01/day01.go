@@ -1,25 +1,13 @@
 package day01
 
 import (
-	"bufio"
-	"log"
-	"os"
 	"strconv"
 )
 
-func PartTwo(filename string) int {
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
+func PartTwo(lines []string) int {
 	var top1, top2, top3, current int
-	var line string
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line = scanner.Text()
+	for _, line := range lines {
 		if line == "" {
 			if current > top1 {
 				top3 = top2

@@ -1,9 +1,7 @@
 package day10
 
 import (
-	"bufio"
 	"log"
-	"os"
 	"strconv"
 )
 
@@ -50,18 +48,10 @@ func (p *program) getInstruction(cycle int) interface{} {
 	return noop{}
 }
 
-func readProgram(filename string) *program {
-	file, openErr := os.Open(filename)
-	if openErr != nil {
-		log.Fatal(openErr)
-	}
-	defer file.Close()
-
+func readProgram(lines []string) *program {
 	program := makeProgram()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		op := scanner.Text()
+	for _, op := range lines {
 
 		if len(op) >= 4 && op[:4] == "noop" {
 			program.addNoop()
@@ -72,9 +62,6 @@ func readProgram(filename string) *program {
 			program.addAddX(op[5:])
 			continue
 		}
-	}
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
 	}
 
 	return program

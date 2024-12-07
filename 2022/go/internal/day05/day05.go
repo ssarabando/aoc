@@ -1,9 +1,6 @@
 package day05
 
 import (
-	"bufio"
-	"log"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -71,27 +68,22 @@ func decomposeManifest(manifest *[]string) *[][]string {
 	return &stacks
 }
 
-func readShipArrangement(filename string) (crates, orders []string) {
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
+func readShipArrangement(lines []string) (crates, orders []string) {
 	crates = []string{}
 	orders = []string{}
 
 	readingCrates := true
 
-	scanner := bufio.NewScanner(file)
-	for {
-		if success := scanner.Scan(); !success {
-			break
-		}
-		line := scanner.Text()
-		if strings.Trim(line, " ") == "" {
-			readingCrates = false
-			continue
+	for _, line := range lines {
+		if line == "" {
+			if readingCrates {
+				// First time we encounter an empty line, so it is between the crates and the orders.
+				readingCrates = false
+				continue
+			} else {
+				// Since we already read the crates, then this is the second time we encounter an empty line, so this is the eof.
+				break
+			}
 		}
 
 		if readingCrates {
@@ -100,9 +92,6 @@ func readShipArrangement(filename string) (crates, orders []string) {
 			orders = append(orders, line)
 		}
 	}
-	if err = scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
 
 	// The list line of crates has the crates numbers, so ignore those
 	crates = crates[:len(crates)-1]
@@ -110,8 +99,8 @@ func readShipArrangement(filename string) (crates, orders []string) {
 	return crates, orders
 }
 
-func PartOne(filename string) string {
-	crates, orders := readShipArrangement(filename)
+func PartOne(lines []string) string {
+	crates, orders := readShipArrangement(lines)
 
 	shipHold := *decomposeManifest(&crates)
 
@@ -137,8 +126,8 @@ func PartOne(filename string) string {
 	return result.String()
 }
 
-func PartTwo(filename string) string {
-	stacks, orders := readShipArrangement(filename)
+func PartTwo(lines []string) string {
+	stacks, orders := readShipArrangement(lines)
 
 	shipHold := *decomposeManifest(&stacks)
 
