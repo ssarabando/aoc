@@ -4,6 +4,24 @@ import (
 	"strconv"
 )
 
+func PartOne(lines []string) int {
+	maxCalories := 0
+	currentElfCalories := 0
+	for _, line := range lines {
+		if line == "" {
+			// End of the list of calories carried by the current Elf.
+			if currentElfCalories > maxCalories {
+				maxCalories = currentElfCalories
+			}
+			currentElfCalories = 0
+			continue
+		}
+		calories, _ := strconv.Atoi(line)
+		currentElfCalories += calories
+	}
+	return maxCalories
+}
+
 func PartTwo(lines []string) int {
 	var top1, top2, top3, current int
 

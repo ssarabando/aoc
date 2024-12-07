@@ -28,7 +28,11 @@ func getContents(filename string) []string {
 }
 
 func main() {
-	fmt.Println("Day  1, part 2:", day01.PartTwo(getContents("../day01_input.txt")))
+	{
+		lines := getContents("../day01_input.txt")
+		fmt.Println("Day  1, part 1:", day01.PartOne(lines))
+		fmt.Println("Day  1, part 2:", day01.PartTwo(lines))
+	}
 	fmt.Println("Day  2, part 2:", day02.PartTwo(getContents("../day02_input.txt")))
 	{
 		lines := getContents("../day03_input.txt")
