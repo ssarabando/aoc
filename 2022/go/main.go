@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/ssarabando/go_advent_of_code_2022/internal/day01"
-	"github.com/ssarabando/go_advent_of_code_2022/internal/day02"
-	"github.com/ssarabando/go_advent_of_code_2022/internal/day03"
-	"github.com/ssarabando/go_advent_of_code_2022/internal/day04"
-	"github.com/ssarabando/go_advent_of_code_2022/internal/day05"
-	"github.com/ssarabando/go_advent_of_code_2022/internal/day06"
-	"github.com/ssarabando/go_advent_of_code_2022/internal/day07"
-	"github.com/ssarabando/go_advent_of_code_2022/internal/day08"
-	"github.com/ssarabando/go_advent_of_code_2022/internal/day09"
-	"github.com/ssarabando/go_advent_of_code_2022/internal/day10"
-	"github.com/ssarabando/go_advent_of_code_2022/internal/day11"
+
+	"github.com/ssarabando/aoc/2022/go/internal/day01"
+	"github.com/ssarabando/aoc/2022/go/internal/day02"
+	"github.com/ssarabando/aoc/2022/go/internal/day03"
+	"github.com/ssarabando/aoc/2022/go/internal/day04"
+	"github.com/ssarabando/aoc/2022/go/internal/day05"
+	"github.com/ssarabando/aoc/2022/go/internal/day06"
+	"github.com/ssarabando/aoc/2022/go/internal/day07"
+	"github.com/ssarabando/aoc/2022/go/internal/day08"
+	"github.com/ssarabando/aoc/2022/go/internal/day09"
+	"github.com/ssarabando/aoc/2022/go/internal/day10"
+	"github.com/ssarabando/aoc/2022/go/internal/day11"
 )
 
 func main() {
