@@ -16,7 +16,7 @@ import (
 	"github.com/ssarabando/aoc/2022/go/internal/day08"
 	"github.com/ssarabando/aoc/2022/go/internal/day09"
 	"github.com/ssarabando/aoc/2022/go/internal/day10"
-	// "github.com/ssarabando/aoc/2022/go/internal/day11"
+	"github.com/ssarabando/aoc/2022/go/internal/day11"
 )
 
 func getContents(filename string) []string {
@@ -78,5 +78,12 @@ func main() {
 		fmt.Println("Day 10, part 1:", day10.PartOne(lines))
 		fmt.Printf("Day 10, part 2:\n%s\n", day10.PartTwo(lines))
 	}
-	// fmt.Println("Day 11, part 1:", day11.PartOne("../day11_input.txt"))
+	{
+		lines := getContents("../day11_input.txt")
+		if result, err := day11.PartOne(lines, "../day11_input.txt"); err != nil {
+			log.Fatal(err)
+		} else {
+			fmt.Println("Day 11, part 1:", result)
+		}
+	}
 }
