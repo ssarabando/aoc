@@ -80,10 +80,15 @@ func main() {
 	}
 	{
 		lines := getContents("../day11_input.txt")
-		if result, err := day11.PartOne(lines, "../day11_input.txt"); err != nil {
+		if result, err := day11.PartOne(lines); err != nil {
 			log.Fatal(err)
 		} else {
 			fmt.Println("Day 11, part 1:", result)
+		}
+		if result, err := day11.PartTwo(lines); err != nil {
+			log.Fatal(err)
+		} else {
+			fmt.Println("Day 11, part 2:", result)
 		}
 	}
 }

@@ -11,12 +11,12 @@ type monkey struct {
 	Term1               string
 	Operation           string
 	Term2               string
-	StartingItems       []int
+	StartingItems       []uint64
 	Number              int
 	DivisibleBy         int
 	MonkeyNumberIfTrue  int
 	MonkeyNumberIfFalse int
-	InspectionNumber    int
+	InspectionNumber    uint64
 }
 
 func newMonkey(notes []string) (*monkey, error) {
@@ -29,9 +29,9 @@ func newMonkey(notes []string) (*monkey, error) {
 	}
 
 	items := strings.Split(strings.TrimPrefix(notes[1], "  Starting items: "), ", ")
-	m.StartingItems = make([]int, len(items))
+	m.StartingItems = make([]uint64, len(items))
 	for i, item := range items {
-		if itemNumber, err := strconv.Atoi(item); err != nil {
+		if itemNumber, err := strconv.ParseUint(item, 10, 0); err != nil {
 			return nil, err
 		} else {
 			m.StartingItems[i] = itemNumber
@@ -75,13 +75,13 @@ func newMonkey(notes []string) (*monkey, error) {
 	return &m, nil
 }
 
-func PartOne(lines []string, filename string) (int, error) {
+func computeMonkeyBusiness(lines []string, rounds int, partOne bool) (uint64, error) {
 	monkeys := []monkey{}
 	notes := [6]string{}
 	for lineNumber, line := range lines {
 		if line == "" {
 			if m, err := newMonkey(notes[:]); err != nil {
-				return -1, err
+				return 0, err
 			} else {
 				monkeys = append(monkeys, *m)
 			}
@@ -92,28 +92,32 @@ func PartOne(lines []string, filename string) (int, error) {
 		notes[lineNumber%7] = line
 	}
 
-	for round := 1; round < 21; round++ {
+	var common_multiple uint64 = 1
+	for _, monkey := range monkeys {
+		common_multiple *= uint64(monkey.DivisibleBy)
+	}
+
+	for round := 1; round <= rounds; round++ {
 		for monkeyNumber := 0; monkeyNumber < len(monkeys); monkeyNumber++ {
 			m := &monkeys[monkeyNumber]
-			// for _, m := range monkeys {
-			m.InspectionNumber += len(m.StartingItems)
+			m.InspectionNumber += uint64(len(m.StartingItems))
 			for _, worryLevel := range m.StartingItems {
-				term1 := 0
+				var term1 uint64 = 0
 				if m.Term1 == "old" {
 					term1 = worryLevel
 				} else {
-					if term, err := strconv.Atoi(m.Term1); err != nil {
-						return -1, err
+					if term, err := strconv.ParseUint(m.Term1, 10, 0); err != nil {
+						return 0, err
 					} else {
 						term1 = term
 					}
 				}
-				term2 := 0
+				var term2 uint64 = 0
 				if m.Term2 == "old" {
 					term2 = worryLevel
 				} else {
-					if term, err := strconv.Atoi(m.Term2); err != nil {
-						return -1, err
+					if term, err := strconv.ParseUint(m.Term2, 10, 0); err != nil {
+						return 0, err
 					} else {
 						term2 = term
 					}
@@ -124,13 +128,22 @@ func PartOne(lines []string, filename string) (int, error) {
 				case "*":
 					worryLevel = term1 * term2
 				default:
-					return -1, fmt.Errorf("Invalid operation %s in monkey %d.", m.Operation, m.Number)
+					return 0, fmt.Errorf("Invalid operation %s in monkey %d.", m.Operation, m.Number)
 				}
 
-				worryLevel /= 3
+				if partOne {
+					worryLevel /= 3
+				} else {
+					// Without this, it would overflow, event with an uint64.
+					// Modulo over a common multiple between all monkeys. Since each divisor is a prime,
+					// multiplying all of them yields a number that we can use do decrease the worry levels.
+					// Do not fully understand it, but for more information, see
+					// (this)[https://www.reddit.com/r/adventofcode/comments/zifqmh/comment/izupmlj/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button]
+					worryLevel %= common_multiple
+				}
 
 				var targetMonkey *monkey
-				if worryLevel%m.DivisibleBy == 0 {
+				if worryLevel%uint64(m.DivisibleBy) == 0 {
 					targetMonkey = &monkeys[m.MonkeyNumberIfTrue]
 				} else {
 					targetMonkey = &monkeys[m.MonkeyNumberIfFalse]
@@ -138,13 +151,20 @@ func PartOne(lines []string, filename string) (int, error) {
 
 				targetMonkey.StartingItems = append(targetMonkey.StartingItems, worryLevel)
 			}
-			m.StartingItems = []int{}
+			m.StartingItems = []uint64{}
 		}
 	}
 
 	slices.SortFunc(monkeys, func(monkeyA, monkeyB monkey) int {
 		// Sort descending
-		return monkeyB.InspectionNumber - monkeyA.InspectionNumber
+		result := int64(monkeyB.InspectionNumber - monkeyA.InspectionNumber)
+		if result < 0 {
+			return -1
+		} else if result > 0 {
+			return 1
+		} else {
+			return 0
+		}
 	})
 
 	return monkeys[0].InspectionNumber * monkeys[1].InspectionNumber, nil
@@ -154,4 +174,12 @@ func extractMonkeyNumber(line string) (int, error) {
 	trimmedLine := strings.TrimSuffix(line, ":")
 	numberRepr := strings.Fields(trimmedLine)[1]
 	return strconv.Atoi(numberRepr)
+}
+
+func PartOne(lines []string) (uint64, error) {
+	return computeMonkeyBusiness(lines, 20, true)
+}
+
+func PartTwo(lines []string) (uint64, error) {
+	return computeMonkeyBusiness(lines, 10000, false)
 }

@@ -1,6 +1,8 @@
 package day11
 
-import "testing"
+import (
+	"testing"
+)
 
 func getTestData() []string {
 	return []string{
@@ -36,9 +38,19 @@ func getTestData() []string {
 }
 
 func TestPartOne(t *testing.T) {
-	actual, _ := PartOne(getTestData(), "day11_test_input.txt")
-	expected := 10605
+	var actual uint64
+	actual, _ = PartOne(getTestData())
+	const expected uint64 = 10605
 	if actual != expected {
 		t.Fatalf("Day 11, part 1: expected %d, got %d.", expected, actual)
+	}
+}
+
+func TestPartTwo(t *testing.T) {
+	var actual uint64
+	actual, _ = PartTwo(getTestData())
+	const expected uint64 = 2713310158
+	if actual != expected {
+		t.Fatalf("Day 11, part 2: expected %d, got %d.", expected, actual)
 	}
 }
